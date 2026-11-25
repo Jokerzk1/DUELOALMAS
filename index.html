@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duelo das Almas — Card game de fusões e duelos online</title>
+<meta name="description" content="Duelo das Almas: card game de fantasia sombria com 367 cartas, 66 fusões, armadilhas decisivas, 7 ilhas para explorar e duelos online ranqueados numa cidade viva. Grátis para Windows.">
+<meta property="og:title" content="Duelo das Almas">
+<meta property="og:description" content="Card game de fusões, armadilhas e duelos online. Grátis para Windows.">
+<meta property="og:image" content="img/tela-duelo.jpg">
+<link rel="icon" href="img/icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ouro:#e2c27a;--ouro2:#b48a45;--bronze:#6b5025;--fundo:#07060a;--texto:#e8dcc0;--apagado:#a8977a;--azul:#7fd4ff;--k:1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--fundo);color:var(--texto);font:500 19px/1.55 'Rajdhani','Segoe UI',sans-serif;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:var(--ouro);text-decoration:none}
+h1,h2,h3{font-family:'Cinzel',Georgia,serif;margin:0;color:var(--ouro);letter-spacing:.06em}
+.wrap{width:min(1200px,calc(100% - 32px));margin:0 auto}
+
+/* ---------- topo ---------- */
+.topo{position:fixed;inset:0 0 auto 0;z-index:50;transition:background .3s,box-shadow .3s}
+.topo.solido{background:#07060aee;box-shadow:0 2px 0 #b48a4533,0 10px 30px #000a;backdrop-filter:blur(6px)}
+.topo .wrap{display:flex;align-items:center;gap:22px;height:72px}
+.marca{display:flex;align-items:center;gap:12px;font:900 20px 'Cinzel',serif;letter-spacing:.14em;color:var(--ouro);white-space:nowrap}
+.marca img{width:40px;height:40px;filter:drop-shadow(0 0 8px #e2c27a55)}
+.menu{display:flex;gap:22px;margin-left:auto}
+.menu a{color:var(--texto);font-weight:600;letter-spacing:.06em;font-size:17px;opacity:.85}
+.menu a:hover{opacity:1;color:var(--ouro)}
+@media (max-width:860px){.menu{display:none}.marca span{font-size:16px}}
+
+/* ---------- botões ---------- */
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 30px;border:none;border-radius:8px;cursor:pointer;
+  font:700 18px 'Cinzel',serif;letter-spacing:.08em;color:#1a1108;background:linear-gradient(#fff1c9,#e2c27a 45%,#9a7438);
+  box-shadow:0 0 0 2px #000,0 0 0 4px #b48a4566,0 10px 26px #000c,0 0 30px #e2c27a44;transition:transform .15s,box-shadow .15s;white-space:nowrap}
+.bt:hover{transform:translateY(-2px);box-shadow:0 0 0 2px #000,0 0 0 4px #e2c27a,0 14px 30px #000c,0 0 44px #e2c27a77}
+.bt.grande{padding:20px 44px;font-size:22px}
+.bt.peq{padding:9px 18px;font-size:14px}
+.bt.vazado{background:#0008;color:var(--ouro);box-shadow:0 0 0 2px var(--ouro2),0 10px 26px #000a}
+.bt.vazado:hover{background:#1a130b}
+
+/* ---------- herói ---------- */
+.heroi{position:relative;min-height:100vh;display:grid;place-items:center;text-align:center;overflow:hidden;padding:110px 0 70px}
+.heroi-bg{position:absolute;inset:-4%;background:url(img/cidade.jpg) center/cover;filter:saturate(1.1);transform:scale(1.05);animation:zoomLento 30s ease-in-out infinite alternate}
+@keyframes zoomLento{to{transform:scale(1.14) translateY(-1%)}}
+.heroi::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#07060a55,#07060aee 72%),linear-gradient(#07060a00 55%,#07060a)}
+.heroi .wrap{position:relative;z-index:1}
+.selo-topo{display:inline-block;padding:6px 16px;border:1px solid #b48a4577;border-radius:30px;font-weight:700;letter-spacing:.2em;font-size:14px;color:var(--ouro);background:#0009;margin-bottom:22px}
+.heroi h1{font-size:clamp(46px,9vw,112px);font-weight:900;letter-spacing:.12em;line-height:1;text-shadow:0 0 40px #e2c27a55,0 6px 0 #000,0 0 90px #000}
+.heroi h1 small{display:block;font-size:.26em;letter-spacing:.5em;color:#f3dfa6;margin-top:14px;font-weight:700}
+.heroi p.lead{max-width:760px;margin:26px auto 34px;font-size:clamp(19px,2.2vw,24px);color:#f0e6cc;text-shadow:0 2px 6px #000}
+.heroi .acoes{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.heroi .nota{margin-top:16px;font-size:15px;color:var(--apagado);letter-spacing:.05em}
+.rolar{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:1;color:var(--ouro);font-size:28px;opacity:.7;animation:pula 1.8s infinite}
+@keyframes pula{50%{transform:translate(-50%,8px)}}
+
+/* ---------- números ---------- */
+.numeros{position:relative;z-index:2;margin-top:-40px}
+.numeros .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:22px;border-radius:14px;background:linear-gradient(#17110b,#0c0906);box-shadow:0 0 0 1px #b48a4566,0 20px 50px #000c}
+.num{text-align:center}
+.num b{display:block;font:900 clamp(28px,4vw,44px) 'Cinzel',serif;color:var(--ouro);line-height:1.1}
+.num span{font-size:15px;color:var(--apagado);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+@media (max-width:760px){.numeros .wrap{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- seções ---------- */
+section{padding:110px 0}
+.titulo-sec{text-align:center;margin-bottom:54px}
+.titulo-sec .pre{font-weight:700;letter-spacing:.3em;color:var(--apagado);font-size:14px;text-transform:uppercase}
+.titulo-sec h2{font-size:clamp(32px,5vw,54px);margin-top:8px;text-shadow:0 0 30px #e2c27a33}
+.titulo-sec p{max-width:720px;margin:14px auto 0;color:#d8ccb0;font-size:20px}
+.titulo-sec img.div{width:min(520px,80%);margin:18px auto 0;opacity:.9}
+
+/* ---------- o jogo ---------- */
+.dupla{display:grid;grid-template-columns:1.25fr 1fr;gap:56px;align-items:center}
+.dupla.inv{grid-template-columns:1fr 1.25fr}
+.dupla.inv .tela{order:2}
+@media (max-width:900px){.dupla,.dupla.inv{grid-template-columns:1fr}.dupla.inv .tela{order:0}}
+.tela{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 0 0 2px #000,0 0 0 4px #b48a4588,0 30px 70px #000,0 0 60px #e2c27a22;cursor:zoom-in}
+.tela img{width:100%;transition:transform .6s}
+.tela:hover img{transform:scale(1.03)}
+.texto h3{font-size:clamp(26px,3.4vw,36px);margin-bottom:16px}
+.texto p{color:#d8ccb0;margin:0 0 14px}
+.lista{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}
+.lista li{display:flex;gap:12px;align-items:flex-start}
+.lista li::before{content:"◆";color:var(--ouro);font-size:14px;margin-top:4px}
+
+/* ---------- recursos ---------- */
+.recursos{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media (max-width:900px){.recursos{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.recursos{grid-template-columns:1fr}}
+.rec{position:relative;padding:30px 26px 28px;border-radius:14px;text-align:center;background:linear-gradient(#18120c,#0b0806);
+  box-shadow:0 0 0 1px #b48a4555,0 18px 40px #000b;transition:transform .25s,box-shadow .25s}
+.rec:hover{transform:translateY(-6px);box-shadow:0 0 0 1px var(--ouro),0 24px 50px #000,0 0 40px #e2c27a33}
+.rec img{width:96px;height:96px;margin:0 auto 14px;filter:drop-shadow(0 8px 14px #000)}
+.rec h3{font-size:22px;margin-bottom:10px}
+.rec p{margin:0;color:#cbbd9f;font-size:17px}
+
+/* ---------- cartas ---------- */
+#cartas{background:radial-gradient(ellipse at 50% 30%,#1c1309,#07060a 70%)}
+.leque{position:relative;height:520px;max-width:1100px;margin:0 auto}
+.carta{position:absolute;left:50%;bottom:20px;width:230px;aspect-ratio:5/7;border-radius:12px;overflow:hidden;transform-origin:50% 120%;
+  box-shadow:0 0 0 3px #000,0 0 0 6px var(--c,#b48a45),0 20px 40px #000d;transition:transform .45s cubic-bezier(.2,.8,.25,1),box-shadow .3s;background:#000}
+.carta img{width:100%;height:100%;object-fit:cover}
+.carta span{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 10px;background:linear-gradient(#0000,#000e);font:700 15px 'Cinzel',serif;color:#f3dfa6;text-align:center;line-height:1.15}
+.carta:hover{z-index:20;box-shadow:0 0 0 3px #000,0 0 0 6px var(--ouro),0 30px 60px #000,0 0 50px var(--c,#e2c27a)}
+@media (max-width:760px){.leque{height:380px}.carta{width:150px}}
+
+/* ---------- emblemas ---------- */
+.emblemas{display:flex;justify-content:center;flex-wrap:wrap;gap:18px}
+.emb{width:140px;text-align:center;perspective:600px}
+.emb img{width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 10px 16px #000) drop-shadow(0 0 22px var(--c));transition:transform .9s cubic-bezier(.2,.8,.25,1)}
+.emb:hover img{transform:rotateY(360deg) scale(1.08)}
+.emb b{display:block;margin-top:8px;font:700 18px 'Cinzel',serif;color:var(--ouro)}
+.emb small{color:var(--apagado);font-weight:700;letter-spacing:.06em}
+
+/* ---------- molduras ---------- */
+.molduras{display:flex;justify-content:center;align-items:flex-end;flex-wrap:wrap;gap:20px}
+.molduras img{width:180px;filter:drop-shadow(0 14px 20px #000);transition:transform .3s}
+.molduras img:hover{transform:translateY(-8px) scale(1.05)}
+
+/* ---------- galeria ---------- */
+.galeria{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:900px){.galeria{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.galeria{grid-template-columns:1fr}}
+.galeria figure{margin:0}
+.galeria figcaption{margin-top:10px;text-align:center;color:var(--apagado);font-weight:700;letter-spacing:.06em}
+.zoom{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#000e;padding:20px;cursor:zoom-out}
+.zoom.on{display:grid}
+.zoom img{max-height:92vh;border-radius:10px;box-shadow:0 0 0 3px var(--ouro2),0 30px 80px #000}
+
+/* ---------- download ---------- */
+#baixar{position:relative;overflow:hidden;text-align:center}
+#baixar::before{content:"";position:absolute;inset:0;background:url(img/cen-temporada-1.jpg) center/cover;opacity:.28;filter:blur(2px)}
+#baixar::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#07060a55,#07060a 75%)}
+#baixar .wrap{position:relative;z-index:1}
+.caixa-baixar{max-width:820px;margin:0 auto;padding:54px 40px 46px;border-radius:16px;background:linear-gradient(#1a130bf2,#0c0906f5);
+  box-shadow:0 0 0 2px #000,0 0 0 4px var(--ouro2),0 30px 80px #000,0 0 80px #e2c27a33}
+.caixa-baixar img.ic{width:110px;margin:0 auto 14px;filter:drop-shadow(0 0 20px #e2c27a66)}
+.caixa-baixar h2{font-size:clamp(30px,4.5vw,48px)}
+.caixa-baixar p{color:#d8ccb0;margin:12px 0 28px}
+.req{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 26px;margin-top:26px;color:var(--apagado);font-weight:700;font-size:16px}
+.passos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px;text-align:left}
+@media (max-width:700px){.passos{grid-template-columns:1fr}}
+.passo{padding:16px 18px;border-radius:10px;background:#0007;box-shadow:inset 0 0 0 1px #b48a4544}
+.passo b{font:900 26px 'Cinzel',serif;color:var(--ouro);margin-right:8px}
+.link-cru{display:block;margin-top:18px;font-size:15px;color:var(--apagado);word-break:break-all}
+.link-cru a{color:var(--azul)}
+
+/* ---------- perguntas ---------- */
+.faq{max-width:860px;margin:0 auto;display:grid;gap:12px}
+.faq details{border-radius:10px;background:linear-gradient(#16100a,#0c0906);box-shadow:0 0 0 1px #b48a4544;padding:0 22px}
+.faq summary{cursor:pointer;list-style:none;padding:18px 0;font:700 19px 'Cinzel',serif;color:var(--ouro);display:flex;justify-content:space-between;gap:12px}
+.faq summary::after{content:"+";font-size:24px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq details p{margin:0 0 18px;color:#d8ccb0}
+
+/* ---------- rodapé ---------- */
+footer{padding:46px 0 60px;text-align:center;color:var(--apagado);font-size:16px;border-top:1px solid #b48a4533}
+footer .marca{justify-content:center;margin-bottom:12px}
+
+/* jogadores online (ao vivo, do servidor do jogo) */
+.online{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:30px;background:#0009;box-shadow:inset 0 0 0 1px #4ade8055;font-weight:700;font-size:15px;letter-spacing:.04em;color:#c8f5d8;white-space:nowrap}
+.online i{width:10px;height:10px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;animation:pisca 1.6s infinite}
+.online b{color:#fff;font-size:17px}
+.online.oculto{display:none}
+@keyframes pisca{50%{opacity:.35}}
+.online-heroi{margin:0 auto 22px;font-size:18px;padding:9px 20px}
+.online-heroi b{font-size:22px}
+@media (max-width:860px){.topo .online{display:none}}
+/* aparecer ao rolar */
+.surge{opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}
+.surge.vis{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.surge{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="topo" id="topo"><div class="wrap">
+  <a class="marca" href="#"><img src="img/icone.png" alt=""><span>DUELO DAS ALMAS</span></a>
+  <nav class="menu"><a href="#jogo">O jogo</a><a href="#recursos">Recursos</a><a href="#cartas">Cartas</a><a href="#telas">Telas</a><a href="#perguntas">Perguntas</a></nav>
+  <span class="online oculto" data-online><i></i><b>0</b> online</span>
+  <a class="bt peq" href="https://github.com/Jokerzk1/DUELOALMAS/releases/latest/download/Instalar-Duelo-das-Almas.exe" download>⬇ Baixar</a>
+</div></header>
+
+<!-- HERÓI -->
+<div class="heroi">
+  <div class="heroi-bg"></div>
+  <div class="wrap">
+    <div><span class="online online-heroi oculto" data-online><i></i><b>0</b> duelistas online agora</span></div>
+    <span class="selo-topo">CARD GAME · FANTASIA SOMBRIA · ONLINE</span>
+    <h1>DUELO DAS ALMAS<small>A CIDADELA DE VESSALIN TE ESPERA</small></h1>
+    <p class="lead">Monte seu deck, funda criaturas lendárias, prepare armadilhas que viram o jogo e enfrente duelistas do mundo todo numa cidade viva.</p>
+    <div class="acoes">
+      <a class="bt grande" href="https://github.com/Jokerzk1/DUELOALMAS/releases/latest/download/Instalar-Duelo-das-Almas.exe" download>⬇ Baixar grátis</a>
+      <a class="bt grande vazado" href="#jogo">Conhecer o jogo</a>
+    </div>
+    <div class="nota">Windows 10/11 · 64 bits · grátis · atualizações automáticas</div>
+  </div>
+  <div class="rolar">⌄</div>
+</div>
+
+<!-- NÚMEROS -->
+<div class="numeros"><div class="wrap">
+  <div class="num"><b>367</b><span>Cartas</span></div>
+  <div class="num"><b>66</b><span>Fusões</span></div>
+  <div class="num"><b>37</b><span>Armadilhas</span></div>
+  <div class="num"><b>7</b><span>Ilhas</span></div>
+  <div class="num"><b>119</b><span>Locais</span></div>
+  <div class="num"><b>9</b><span>Ranks PvP</span></div>
+</div></div>
+
+<!-- O JOGO -->
+<section id="jogo"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">O jogo</div><h2>Cada duelo é uma batalha de almas</h2><img class="div" src="img/divisoria.png" alt=""></div>
+  <div class="dupla surge">
+    <div class="tela" data-zoom><img src="img/tela-duelo.jpg" alt="Duelo no Duelo das Almas" loading="lazy"></div>
+    <div class="texto">
+      <h3>Duelos táticos de cartas</h3>
+      <p>Invoque monstros em ataque, em defesa ou virados para baixo. Junte dois ou três monstros para <b>fundir</b> uma criatura muito mais forte. Esconda <b>armadilhas</b> no campo e destrua o ataque do oponente na hora certa.</p>
+      <ul class="lista">
+        <li>13 tipos de criatura: dragões, magos, insetos, demônios, máquinas, fadas e muito mais</li>
+        <li>Fusões em cadeia que podem virar o duelo num único turno</li>
+        <li>Magias de campo, equipamentos e armadilhas decisivas</li>
+      </ul>
+    </div>
+  </div>
+  <div class="dupla inv surge" style="margin-top:90px">
+    <div class="tela" data-zoom><img src="img/tela-cidade.jpg" alt="A Cidadela de Vessalin" loading="lazy"></div>
+    <div class="texto">
+      <h3>Uma cidade viva e online</h3>
+      <p>A <b>Cidadela de Vessalin</b> é o coração do jogo. Ande pela praça, veja outros duelistas passando, converse no chat e desafie quem estiver por perto.</p>
+      <ul class="lista">
+        <li>Chat global, da guilda e sussurros privados</li>
+        <li>Amigos, guildas com chat e cargos</li>
+        <li>Loja, biblioteca de cartas, academia e mesas de duelo</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- RECURSOS -->
+<section id="recursos" style="padding-top:40px"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">Recursos</div><h2>Tudo que um duelista precisa</h2></div>
+  <div class="recursos">
+    <div class="rec surge"><img src="img/med-fusoes.webp" alt=""><h3>66 Fusões</h3><p>Combine monstros e desbloqueie fusões raras. Monte seu Deck de Fusão e surpreenda.</p></div>
+    <div class="rec surge"><img src="img/med-duelos.webp" alt=""><h3>Armadilhas</h3><p>As peças-chave do jogo: anule ataques, destrua invasores e mude o rumo do duelo.</p></div>
+    <div class="rec surge"><img src="img/med-jornada.webp" alt=""><h3>7 Ilhas</h3><p>De Morvaneth à Cidadela Celeste de Ossarym: 119 locais, chefes e recompensas.</p></div>
+    <div class="rec surge"><img src="img/med-arena.webp" alt=""><h3>PvP ranqueado</h3><p>Do Ferro à Antimatéria: suba de rank, ganhe molduras exclusivas e entre no ranking.</p></div>
+    <div class="rec surge"><img src="img/med-irmandade.webp" alt=""><h3>Guildas e amigos</h3><p>Funde sua guilda, converse, sussurre e desafie seus amigos para um duelo.</p></div>
+    <div class="rec surge"><img src="img/med-colecao.webp" alt=""><h3>Coleção</h3><p>367 cartas pintadas para colecionar, pacotes temáticos, temporadas e conquistas.</p></div>
+  </div>
+</div></section>
+
+<!-- CARTAS -->
+<section id="cartas"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">Cartas</div><h2>Criaturas lendárias</h2><p>Cada carta tem arte pintada à mão digital. Algumas só nascem de fusões.</p></div>
+  <div class="leque" id="leque">
+    <div class="carta" style="--c:#ff7a2a"><img src="img/carta-55.jpg" alt="" loading="lazy"><span>Solkaryn, Fênix Eterna</span></div>
+    <div class="carta" style="--c:#5a8aff"><img src="img/carta-58.jpg" alt="" loading="lazy"><span>Ozmandel, o Grão-Arcano</span></div>
+    <div class="carta" style="--c:#c0261a"><img src="img/carta-71.jpg" alt="" loading="lazy"><span>Kharoth, Devorador de Reis</span></div>
+    <div class="carta" style="--c:#e2c27a"><img src="img/carta-102.jpg" alt="" loading="lazy"><span>Aurathorn, Lorde-Dragão</span></div>
+    <div class="carta" style="--c:#9a6aff"><img src="img/carta-125.jpg" alt="" loading="lazy"><span>Xal'Gorath, o Imperador</span></div>
+    <div class="carta" style="--c:#8ab4ff"><img src="img/carta-130.jpg" alt="" loading="lazy"><span>Nythrae, Dragoa da Lua</span></div>
+    <div class="carta" style="--c:#ffd6f0"><img src="img/carta-121.jpg" alt="" loading="lazy"><span>Elyndra Seis-Asas</span></div>
+  </div>
+</div></section>
+
+<!-- EMBLEMAS E MOLDURAS -->
+<section id="colecionaveis"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">Colecionáveis</div><h2>Emblemas dos deuses</h2><p>Quem começa o duelo é decidido pelo seu emblema. Colecione os sete e mostre o seu para o oponente.</p></div>
+  <div class="emblemas surge">
+    <div class="emb" style="--c:#ffb23a88"><img src="img/emblema-ra.webp" alt="Rá"><b>Rá</b><small>Padrão</small></div>
+    <div class="emb" style="--c:#6aa0ff88"><img src="img/emblema-isis.webp" alt="Ísis"><b>Ísis</b><small>Padrão</small></div>
+    <div class="emb" style="--c:#2fd08a88"><img src="img/emblema-osiris.webp" alt="Osíris"><b>Osíris</b><small>Loja</small></div>
+    <div class="emb" style="--c:#9a6aff88"><img src="img/emblema-anubis.webp" alt="Anúbis"><b>Anúbis</b><small>Loja</small></div>
+    <div class="emb" style="--c:#3ad6d088"><img src="img/emblema-horus.webp" alt="Hórus"><b>Hórus</b><small>Loja</small></div>
+    <div class="emb" style="--c:#ff4a3a88"><img src="img/emblema-sekhmet.webp" alt="Sekhmet"><b>Sekhmet</b><small>Loja</small></div>
+    <div class="emb" style="--c:#c46aff88"><img src="img/emblema-bastet.webp" alt="Bastet"><b>Bastet</b><small>Loja</small></div>
+  </div>
+  <div class="titulo-sec surge" style="margin-top:100px"><h2>Molduras de perfil</h2><p>Sua moldura é o seu painel no duelo. Ganhe as de rank subindo no PvP ou compre as raras na loja.</p></div>
+  <div class="molduras surge">
+    <img src="img/moldura-umbrael.webp" alt="" loading="lazy"><img src="img/moldura-rk-rubi.webp" alt="" loading="lazy"><img src="img/moldura-rk-antimateria.webp" alt="" loading="lazy">
+    <img src="img/moldura-rk-ouro.webp" alt="" loading="lazy"><img src="img/moldura-ossarym.webp" alt="" loading="lazy">
+  </div>
+</div></section>
+
+<!-- TELAS -->
+<section id="telas" style="padding-top:40px"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">Telas</div><h2>Veja o jogo</h2></div>
+  <div class="galeria">
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-cidade.jpg" alt="" loading="lazy"></div><figcaption>A praça da Cidadela</figcaption></figure>
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-duelo.jpg" alt="" loading="lazy"></div><figcaption>Duelo online</figcaption></figure>
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-emblema.jpg" alt="" loading="lazy"></div><figcaption>Quem começa? O emblema decide</figcaption></figure>
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-leque.jpg" alt="" loading="lazy"></div><figcaption>Escolha suas cartas em leque</figcaption></figure>
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-loja.jpg" alt="" loading="lazy"></div><figcaption>Loja de molduras e emblemas</figcaption></figure>
+    <figure class="surge"><div class="tela" data-zoom><img src="img/tela-amigos.jpg" alt="" loading="lazy"></div><figcaption>Chat, amigos e sussurros</figcaption></figure>
+  </div>
+</div></section>
+
+<!-- DOWNLOAD -->
+<section id="baixar"><div class="wrap">
+  <div class="caixa-baixar surge">
+    <img class="ic" src="img/icone.png" alt="">
+    <h2>Baixe e jogue grátis</h2>
+    <p>Instale, crie sua conta e entre na Cidadela de Vessalin. O jogo se atualiza sozinho sempre que sai novidade.</p>
+    <a class="bt grande" href="https://github.com/Jokerzk1/DUELOALMAS/releases/latest/download/Instalar-Duelo-das-Almas.exe" download>⬇ Baixar para Windows</a>
+    <div class="req"><span>🖥 Windows 10 ou 11 (64 bits)</span><span>💾 ~1 GB livre</span><span>🌐 Internet para o modo online</span><span>📺 720p até 4K</span></div>
+    <div class="passos">
+      <div class="passo"><b>1</b>Baixe o instalador <i>Instalar-Duelo-das-Almas.exe</i>.</div>
+      <div class="passo"><b>2</b>Abra e siga a instalação. Se o Windows avisar, clique em <i>Mais informações → Executar assim mesmo</i>.</div>
+      <div class="passo"><b>3</b>Crie sua conta, escolha seu deck inicial e comece na praça.</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- PERGUNTAS -->
+<section id="perguntas"><div class="wrap">
+  <div class="titulo-sec surge"><div class="pre">Perguntas</div><h2>Dúvidas frequentes</h2></div>
+  <div class="faq">
+    <details class="surge"><summary>O jogo é grátis?</summary><p>Sim. Tudo se conquista jogando: Souls ganhas nos duelos e missões compram pacotes, emblemas e molduras.</p></details>
+    <details class="surge"><summary>Preciso de internet?</summary><p>Para jogar com outros duelistas, entrar na cidade, no PvP, nas guildas e no chat, sim. O progresso fica salvo na sua conta.</p></details>
+    <details class="surge"><summary>Funciona na minha resolução?</summary><p>Sim. O jogo se ajusta sozinho a qualquer tela: 720p, 1080p, 2K, 4K e ultrawide.</p></details>
+    <details class="surge"><summary>Como funcionam as fusões?</summary><p>Selecione dois ou três monstros da mão: se combinarem, nasce uma criatura nova muito mais forte. Fusões raras precisam ser conquistadas antes de usar.</p></details>
+    <details class="surge"><summary>O Windows mostrou um aviso ao instalar. É seguro?</summary><p>O aviso aparece porque o instalador ainda não tem assinatura digital paga. Clique em “Mais informações” e depois em “Executar assim mesmo”.</p></details>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="marca"><img src="img/icone.png" alt=""><span>DUELO DAS ALMAS</span></div>
+  <div>Card game de fantasia sombria · <a href="https://github.com/Jokerzk1/DUELOALMAS/releases/latest/download/Instalar-Duelo-das-Almas.exe" download>Baixar o jogo</a></div>
+  <div style="margin-top:8px">© 2026 Duelo das Almas. Todos os direitos reservados.</div>
+</div></footer>
+
+<div class="zoom" id="zoom"><img alt=""></div>
+
+<script>
+// topo sólido ao rolar
+const topo = document.getElementById('topo');
+const aoRolar = () => topo.classList.toggle('solido', scrollY > 40);
+addEventListener('scroll', aoRolar, { passive: true }); aoRolar();
+// aparecer ao rolar
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); } }), { threshold: .12 });
+document.querySelectorAll('.surge').forEach(el => obs.observe(el));
+// leque de cartas (abre quando aparece na tela)
+const cartas = [...document.querySelectorAll('#leque .carta')], meio = (cartas.length - 1) / 2;
+const espalhar = aberto => cartas.forEach((c, i) => {
+  const d = i - meio, larg = innerWidth < 760 ? 70 : 125;
+  c.style.transform = aberto ? `translateX(calc(-50% + ${d * larg}px)) translateY(${Math.abs(d) * 14}px) rotate(${d * 7}deg)` : 'translateX(-50%) rotate(0deg)';
+  c.style.zIndex = 10 - Math.abs(Math.round(d));
+});
+espalhar(false);
+new IntersectionObserver(es => es.forEach(e => espalhar(e.isIntersecting)), { threshold: .35 }).observe(document.getElementById('leque'));
+addEventListener('resize', () => espalhar(true));
+cartas.forEach(c => { c.onmouseenter = () => c.style.transform += ' translateY(-30px) scale(1.08)'; c.onmouseleave = () => espalhar(true); });
+// quantos duelistas estão online AGORA (o servidor do jogo publica o endereço no GitHub; o túnel muda de endereço)
+const LINKS_SERVIDOR = ['https://api.github.com/repos/Jokerzk1/DUELOALMAS/contents/servidor.json?ref=servidor',
+  'https://raw.githubusercontent.com/Jokerzk1/DUELOALMAS/servidor/servidor.json'];
+let servidor = null;
+async function statusDe(url) { const r = await fetch(url + '/api/status', { cache: 'no-store' }); if (!r.ok) throw 0; return r.json(); }
+async function acharServidor() {   // testa cada endereço publicado até um responder
+  for (const url of LINKS_SERVIDOR) {
+    try {
+      const r = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' }); if (!r.ok) continue;
+      let j = await r.json(); if (j.content) j = JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\s/g, '')))));
+      if (!j || !/^https:\/\//.test(j.servidor)) continue;
+      const u = j.servidor.replace(/\/$/, ''); await statusDe(u); return u;
+    } catch (e) { /* tenta o próximo */ }
+  }
+  return null;
+}
+async function atualizarOnline() {
+  try {
+    if (!servidor) servidor = await acharServidor();
+    if (!servidor) return;
+    const n = +(await statusDe(servidor)).online || 0;
+    document.querySelectorAll('[data-online]').forEach(el => { el.querySelector('b').textContent = n.toLocaleString('pt-BR'); el.classList.toggle('oculto', n < 1); });
+  } catch (e) { servidor = null; }   // o servidor mudou de endereço: procura de novo na próxima
+}
+atualizarOnline(); setInterval(atualizarOnline, 60000);
+// zoom das telas
+const zoom = document.getElementById('zoom');
+document.querySelectorAll('[data-zoom]').forEach(t => t.onclick = () => { zoom.querySelector('img').src = t.querySelector('img').src; zoom.classList.add('on'); });
+zoom.onclick = () => zoom.classList.remove('on');
+addEventListener('keydown', e => { if (e.key === 'Escape') zoom.classList.remove('on'); });
+</script>
+</body>
+</html>
